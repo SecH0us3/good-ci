@@ -18,6 +18,16 @@ toc="$(sed -n '/<nav id="TOC"/,/<\/nav>/p' _site/index.html)"
 echo "$toc" | grep -q 'Step 1\.' || fail 'table of contents has no steps'
 if echo "$toc" | grep -q 'secure CI/CD instructions'; then fail 'table of contents repeats the document title'; fi
 
+# The page has a description, a canonical address and a preview image for social networks
+grep -q '<meta name="description" content="..*">' _site/index.html || fail 'no meta description'
+grep -qF '<link rel="canonical" href="https://harden-ci.secmy.app/">' _site/index.html || fail 'no canonical link'
+grep -qF '<meta property="og:image" content="https://harden-ci.secmy.app/social-preview.png">' _site/index.html || fail 'no og:image'
+for f in favicon.svg favicon-32.png apple-touch-icon.png social-preview.png; do
+  [ -s "_site/$f" ] || fail "missing file: $f"
+done
+# PNG stores width and height as two 4-byte numbers starting at byte 17
+[ "$(od -An -tu1 -j16 -N8 _site/social-preview.png | tr -s ' \n' ' ' | sed 's/^ //; s/ $//')" = '0 0 4 176 0 0 2 118' ] || fail 'social-preview.png must be 1200x630'
+
 # The Markdown copies are identical to their sources
 cmp -s README.md _site/README.md || fail 'README.md copy differs'
 cmp -s README.md _site/index.md || fail 'index.md differs from README.md'

@@ -19,10 +19,14 @@ docker run --rm \
   --metadata pagetitle="harden-ci - secure CI/CD instructions for AI agents" \
   --metadata lang=en \
   --css style.css \
+  --include-in-header site/head.html \
   --include-after-body site/footer.html \
   --output /out/index.html \
   README.md
 cp site/style.css _site/style.css
+
+# Icons and the preview image for social networks. The PNG files are rendered from the SVG files next to them
+cp site/assets/favicon.svg site/assets/favicon-32.png site/assets/apple-touch-icon.png site/assets/social-preview.png _site/
 
 # The same text as plain Markdown, for agents. All copies come from README.md
 cp README.md _site/README.md
