@@ -34,9 +34,14 @@ jobs:
             --metadata pagetitle="harden-ci - secure CI/CD instructions for AI agents" \
             --metadata lang=en \
             --css style.css \
+            --include-before-body site/header.html \
+            --include-after-body site/footer.html \
             --output /out/index.html \
             README.md
           cp site/style.css _site/style.css
+
+      - name: Check that the page links to the repository
+        run: grep -qF 'href="https://github.com/SecH0us3/harden-ci"' _site/index.html
 
       - name: Check that template braces from README are kept
         run: |
