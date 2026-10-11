@@ -15,6 +15,7 @@ docker run --rm \
   "$PANDOC_IMAGE" \
   --from gfm --to html5 --standalone \
   --toc --toc-depth=2 \
+  --lua-filter site/toc.lua \
   --metadata pagetitle="harden-ci - secure CI/CD instructions for AI agents" \
   --metadata lang=en \
   --css style.css \

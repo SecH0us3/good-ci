@@ -11,6 +11,13 @@ grep -qF 'href="https://github.com/SecH0us3/harden-ci"' _site/index.html || fail
 grep -qF '{{.Digest}}' _site/index.html || fail 'braces {{.Digest}} lost'
 grep -qF '${{ github.event.* }}' _site/index.html || fail 'braces ${{ github.event.* }} lost'
 
+# The page has one title, and the table of contents lists the steps but not the title
+[ "$(grep -c '<h1' _site/index.html)" = 1 ] || fail 'the page must have exactly one h1'
+
+toc="$(sed -n '/<nav id="TOC"/,/<\/nav>/p' _site/index.html)"
+echo "$toc" | grep -q 'Step 1\.' || fail 'table of contents has no steps'
+if echo "$toc" | grep -q 'secure CI/CD instructions'; then fail 'table of contents repeats the document title'; fi
+
 # The Markdown copies are identical to their sources
 cmp -s README.md _site/README.md || fail 'README.md copy differs'
 cmp -s README.md _site/index.md || fail 'index.md differs from README.md'
