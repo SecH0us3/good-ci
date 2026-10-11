@@ -39,17 +39,6 @@ th { background: var(--code-bg); }
 nav#TOC { border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 1rem; margin: 1.5rem 0; }
 nav#TOC ul { padding-left: 1.25rem; }
 nav#TOC > ul { padding-left: 0.5rem; list-style: none; }
-.site-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-.site-header .site-name { font-weight: 600; color: var(--fg); text-decoration: none; }
-.site-header nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
 .site-footer {
   margin-top: 3rem;
   padding-top: 1rem;
@@ -57,3 +46,4 @@ nav#TOC > ul { padding-left: 0.5rem; list-style: none; }
   color: var(--muted);
   font-size: 0.875rem;
 }
+.site-footer p { margin: 0.25rem 0; }
