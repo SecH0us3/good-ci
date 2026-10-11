@@ -8,7 +8,7 @@ Your task is to make the build and delivery process in this repository meet the 
 
 The work has two stages:
 
-- **Stage 1 - audit.** Do steps 1-15 and give the report described in the "Report" section
+- **Stage 1 - audit.** Do steps 1-16 and give the report described in the "Report" section
 - **Stage 2 - fixing.** It starts after the user has read the report and chosen what to fix. The order is described in the "Fixing" section
 
 The task is done when the repository is fixed, or when the user has clearly refused to fix specific findings
@@ -272,7 +272,7 @@ What to check about signatures:
 - each member has signing set up (`git config commit.gpgsign`, `gpg.format`, `user.signingkey`) with a GPG, SSH or S/MIME key, and the public key is added to their account on the platform;
 - the private signing key is protected: a hardware key or a passphrase. The key is not in the repository and is not stored in CI secrets unless needed;
 - commits from bots and release jobs are signed too. If they have an exception from the signature rule, this is a high priority finding: the exception is a way around the rule;
-- **commits made through the platform interface** (the web editor, the merge and rebase buttons, the API) are allowed on one condition only: the platform signs them with its own key and shows them as verified. Such a commit counts as signed: it confirms that an account that logged in to the platform made it. This is why the account protection from step 15 is required here. If the platform lets such commits through without a signature, this is a high priority finding. The fix is to turn on signing by the platform. If that is not possible, forbid changes through the interface: members commit and rebase only locally, and merging is done in a way that does not create an unsigned commit. Check how this works on the user's platform in its documentation. At the time of writing: GitHub always signs such commits; GitLab by default lets them through unsigned until the "Sign web-based commits" setting is turned on in the group or project, and rebasing a PR from the GitLab interface removes signatures from already signed commits
+- **commits made through the platform interface** (the web editor, the merge and rebase buttons, the API) are allowed on one condition only: the platform signs them with its own key and shows them as verified. Such a commit counts as signed: it confirms that an account that logged in to the platform made it. This is why the account protection from step 16 is required here. If the platform lets such commits through without a signature, this is a high priority finding. The fix is to turn on signing by the platform. If that is not possible, forbid changes through the interface: members commit and rebase only locally, and merging is done in a way that does not create an unsigned commit. Check how this works on the user's platform in its documentation. At the time of writing: GitHub always signs such commits; GitLab by default lets them through unsigned until the "Sign web-based commits" setting is turned on in the group or project, and rebasing a PR from the GitLab interface removes signatures from already signed commits
 
 If signing is not set up, in the fix plan first suggest setting up signing for all members and bots, and only then turning on the required rule. In the reverse order the platform will start rejecting members' commits
 
@@ -312,7 +312,7 @@ How to make up for the missing second person:
 
 - **automatic PR review** by an AI reviewer (Copilot code review, Claude, CodeRabbit and so on). It does not replace a person but catches some mistakes;
 - **self-review of the diff in the PR interface** before the merge, not in the editor: it shows exactly what will go into the branch, including files added by accident;
-- **account protection** (step 15), because a compromised account means a compromised repository;
+- **account protection** (step 16), because a compromised account means a compromised repository;
 - **a wait timer** on the protected deployment environment (step 9): it leaves time to cancel the deployment;
 - **auto-merge is turned off** for PRs from dependency update bots and PRs from forks
 
@@ -645,7 +645,7 @@ The scanner takes the description **from the repository or from build artifacts,
 - **the SBOM** is not in folders that the web server serves (`wwwroot`, `public`, `static`, `dist`) and is not available at addresses like `/sbom.json`, `/bom.json`, `/.well-known/sbom`. Its place is the registry and build artifacts (step 11);
 - the check is automated: after deployment a job requests these addresses and fails if it gets anything other than 404. A check of the code does not replace a check of the real result
 
-For the same reason other service files and addresses must not be reachable in production: source maps, `.git`, `.env`, debug pages and service endpoints like `/actuator`, `/metrics`, `/debug`. Each such case is a medium priority finding. For `.git` and `.env` it is critical
+For the same reason other service files and addresses must not be reachable in production: source maps, `.git`, `.env`, and service endpoints like `/actuator`, `/metrics`, `/debug` (debug mode itself is checked in step 15). Each such case is a medium priority finding. For `.git` and `.env` it is critical
 
 The only exception is an API whose documentation is public on purpose (a public API for third-party developers). The user decides: ask the question in the report. If the documentation is public on purpose, check that the published description has no internal and admin methods
 
@@ -655,13 +655,57 @@ The only exception is an API whose documentation is public on purpose (a public 
 - the input is the API description and the credentials of a test user. Without login the scanner checks only the login page. The credentials come from the CI secret store and work only in the test environment;
 - the run happens in the pipeline after deployment to the test environment, or on a schedule. Findings of high priority and above stop the release;
 - choose the tool by the "Rules for specific recommendations" and by the protocols and description formats the application has. Starting points:
-  - **Swazz** (`https://swazz.secmy.app/`, repository `SecH0us3/swazz`) - an API fuzzer by the author of this file. It accepts OpenAPI, Postman collections, SOAP (WSDL), gRPC (from `.proto` or through reflection) and HAR recordings. It supports multi-step login and call scenarios, where a value from the response of one request is put into the next ones. It writes a report in SARIF and fails the build on findings of a set severity. The image for CI is `ghcr.io/sech0us3/swazz-cli`. Swazz runs in CI and is not part of the product, so the step 15 requirements for dependency licenses do not apply to it. The license is BSL 1.1: free for open source and non-commercial projects, and for companies with yearly revenue up to 1 million US dollars. In other cases a commercial license is needed. If the user falls under the paid case, tell them;
+  - **Swazz** (`https://swazz.secmy.app/`, repository `SecH0us3/swazz`) - an API fuzzer by the author of this file. It accepts OpenAPI, Postman collections, SOAP (WSDL), gRPC (from `.proto` or through reflection) and HAR recordings. It supports multi-step login and call scenarios, where a value from the response of one request is put into the next ones. It writes a report in SARIF and fails the build on findings of a set severity. The image for CI is `ghcr.io/sech0us3/swazz-cli`. Swazz runs in CI and is not part of the product, so the step 16 requirements for dependency licenses do not apply to it. The license is BSL 1.1: free for open source and non-commercial projects, and for companies with yearly revenue up to 1 million US dollars. In other cases a commercial license is needed. If the user falls under the paid case, tell them;
   - **OWASP ZAP** - an open source scanner with a mode that scans an API by its description;
 - whatever tool is chosen, check in its documentation that it really supports the application's protocols, and check in the report that all methods from the description were tested, not a part of them
 
 No DAST is a medium priority finding for applications reachable from the internet, and low for internal ones. An API description reachable in production is a medium priority finding
 
-## Step 15. Additional checks
+## Step 15. Debug mode and development settings in production builds
+
+This step applies to every application. A build made for development gives an attacker extra information and extra entry points: detailed errors with stack traces, debug endpoints, checks that are turned off, binaries that a debugger can attach to. Such settings are fine in a build for a test environment. They are not allowed in a production build
+
+This file does not know the stack of the repository. So you find out how these settings work in each application, and you decide how to check them
+
+**1. Find the build modes.** For each application find which build modes, configurations or environments exist, and which of them goes to production. If you cannot tell which one is production, set ❓ and ask in the report
+
+**2. Find how each setting is turned on in this stack.** Use the official documentation of the framework, the server and the platform. Look for:
+
+- **debug mode of the application and the framework:** detailed error pages, debug toolbars and consoles, hot reload, verbose logs that contain sensitive data;
+- **a debug build:** a debug build configuration, a binary that a debugger can attach to, debug symbols or source maps shipped with the product, missing minification or obfuscation where the platform expects it;
+- **development-only features:** test endpoints, sample data, test accounts, fake login, certificate checks turned off, open CORS for local work;
+- **directory listing** - the web server shows the list of files in a folder;
+- **the HTTP TRACE method** - the server answers TRACE requests
+
+Not every setting exists in every stack. A mobile app has no directory listing and no HTTP TRACE, but it has a debug build. For each setting that does not exist in the stack, write "not applicable" and the reason
+
+Examples to start from. They are not a full list, and you must check them by the "Rules for specific recommendations":
+
+| Stack | Where to look |
+|---|---|
+| ASP.NET Core | `ASPNETCORE_ENVIRONMENT=Development`, the developer exception page, the `Debug` build configuration |
+| Django, Flask | `DEBUG = True`, the Flask debugger |
+| Spring Boot | devtools on the classpath, exposed actuator endpoints, `server.error.include-stacktrace` |
+| Node.js | `NODE_ENV` not set to `production`, source maps in the bundle |
+| PHP | `display_errors`, framework debug flags such as `APP_DEBUG` |
+| Android | `android:debuggable="true"`, the debug build type, `usesCleartextTraffic`, a debug signing key |
+| iOS | the Debug configuration, the `get-task-allow` entitlement |
+| nginx, Apache, IIS | `autoindex on`; `Options Indexes`, `TraceEnable On`; `directoryBrowse` |
+
+**3. Check the production build.** For each setting find its value in the production build mode. If the value comes from an environment variable at deployment, check the deployment config too (manifests, IaC, pipeline variables). Check the default: if the setting is not set anywhere, find what the stack does by default. A production build that depends on a development default is a finding
+
+**4. Check that CI stops a wrong production build.** There must be a blocking check that fails the production build or the release when any of these settings is on:
+
+- the check applies to the production build mode only. A build for a test environment may have debug mode on, and the check must not fail it;
+- a test build must not be able to reach production: the production deployment job accepts only artifacts made in the production build mode. If a debug build can be published or deployed to production, this is a high priority finding;
+- choose the way to check that fits the stack: a check of the config or manifest for the production mode; an inspection of the built artifact (the manifest inside the built mobile package, the environment variables of the built image); for web applications, requests after deployment - an error page shows no stack trace, a TRACE request is rejected, a folder address without an index file does not show a file list;
+- a check of the source config does not replace a check of the built artifact: the build can change the value
+
+If there is no such check, suggest adding it in the fix plan, and say which of the ways above you chose and why
+
+Priorities: debug mode or a debug build in production - high; test accounts or fake login in production - high; other development-only features, directory listing and HTTP TRACE - medium; no blocking check while the settings are correct now - medium
+
+## Step 16. Additional checks
 
 Check each item. If it is missing, this is a finding with the priority given in brackets:
 
@@ -720,11 +764,11 @@ The report ends stage 1. Give it to the user in this order:
 3. **Application inventory** - the table from step 2
 4. **Summary matrix** - one row per application:
 
-   | Application | Unit tests | SAST | Dependencies | Secrets | Pinning by hash | Image: no root | Image: scanning | Image: signing and SBOM | IaC | API and DAST |
-   |---|---|---|---|---|---|---|---|---|---|---|
+   | Application | Unit tests | SAST | Dependencies | Secrets | Pinning by hash | Image: no root | Image: scanning | Image: signing and SBOM | IaC | API and DAST | Production settings |
+   |---|---|---|---|---|---|---|---|---|---|---|---|
 
    Statuses: ✅ the requirement is met and the check is blocking · ⚠️ met in part, or the check is not blocking · ❌ not met · ❓ could not check · "-" not applicable
-5. **Findings** - from critical priority to low. For each: the step, what is wrong, where (the file and line, or the platform setting), what it leads to given the threat model from step 3, how to fix it. This includes findings from all steps, including steps 9, 13 and 15
+5. **Findings** - from critical priority to low. For each: the step, what is wrong, where (the file and line, or the platform setting), what it leads to given the threat model from step 3, how to fix it. This includes findings from all steps, including steps 9, 13, 15 and 16
 6. **Vulnerable dependencies** - in the format from step 6, with chains
 7. **References that are not pinned** - the list from step 10: file, line, current value, suggested value
 8. **Questions for the user** - all questions collected during the audit, in one list. For each, say which conclusion of the report depends on the answer
