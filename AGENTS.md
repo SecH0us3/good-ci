@@ -9,7 +9,7 @@ If you were asked to apply harden-ci to another repository, this file is not for
 - `README.md` - the document. It is the only source of the published text
 - `site/build.sh` - builds the site into `_site/`
 - `site/check.sh` - checks the built site
-- `site/style.css`, `site/footer.html` - the look of the HTML page and its footer
+- `site/style.css`, `site/footer.html`, `site/toc.lua` - the look of the HTML page, its footer, and a filter that puts the title above the table of contents
 - `site/llms.txt`, `site/robots.txt`, `site/ai.txt`, `site/sitemap.xml` - published as they are
 - `.github/workflows/pages.yml` - runs the build and the check on every pull request, and publishes from `main`
 
