@@ -31,7 +31,7 @@ jobs:
             pandoc/core:3.11.0@sha256:62518bfb6833705dc90a1634d8d879299bd820b3f74ad3b32fba8b618452553a \
             --from gfm --to html5 --standalone \
             --toc --toc-depth=2 \
-            --metadata pagetitle="good-ci - secure CI/CD instructions for AI agents" \
+            --metadata pagetitle="harden-ci - secure CI/CD instructions for AI agents" \
             --metadata lang=en \
             --css style.css \
             --output /out/index.html \
