@@ -1,4 +1,4 @@
-# good-ci - secure CI/CD instructions for AI agents
+# harden-ci - secure CI/CD instructions for AI agents
 
 This file is a task for an AI agent: Claude Code, Antigravity, Codex or any other. The user opens the agent in their repository and asks it to follow this file
 
