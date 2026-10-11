@@ -21,36 +21,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build the page from README.md
-        run: |
-          mkdir -p _site
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            -v "$PWD:/data:ro" \
-            -v "$PWD/_site:/out" \
-            pandoc/core:3.11.0@sha256:62518bfb6833705dc90a1634d8d879299bd820b3f74ad3b32fba8b618452553a \
-            --from gfm --to html5 --standalone \
-            --toc --toc-depth=2 \
-            --metadata pagetitle="harden-ci - secure CI/CD instructions for AI agents" \
-            --metadata lang=en \
-            --css style.css \
-            --include-after-body site/footer.html \
-            --output /out/index.html \
-            README.md
-          cp site/style.css _site/style.css
-          cp README.md _site/README.md
+      - name: Build the site
+        run: sh site/build.sh
 
-      - name: Check that the page links to the repository
-        run: grep -qF 'href="https://github.com/SecH0us3/harden-ci"' _site/index.html
-
-      - name: Check that the plain Markdown copy is published
-        run: cmp README.md _site/README.md
-
-      - name: Check that template braces from README are kept
-        run: |
-          grep -qF '{{.Digest}}' _site/index.html
-          # the pattern is split so that Actions does not expand it as an expression
-          grep -qF '$''{{ github.event.* }}' _site/index.html
+      - name: Check the built site
+        run: sh site/check.sh
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         if: github.event_name != 'pull_request'

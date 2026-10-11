@@ -1,0 +1,19 @@
+# harden-ci
+
+> Instructions that an AI coding agent follows to audit a repository and bring its CI/CD to a secure state: tests, SAST, dependency and secret scanning, pinning by hash, image scanning and signing, branch protection and signed commits.
+
+The instructions are one document. An agent reads it inside the repository it has to check, does the audit steps, gives the user a report, and then fixes what the user chooses.
+
+## Docs
+
+- [harden-ci instructions](https://harden-ci.secmy.app/README.md): the full document as plain Markdown - the working rules, 16 audit steps, the report format and the fixing stage
+- [Full text in one file](https://harden-ci.secmy.app/llms-full.txt): the same document, for tools that look for llms-full.txt
+
+## Contributing
+
+- [AGENTS.md](https://harden-ci.secmy.app/AGENTS.md): how to build, check and change harden-ci itself, for agents that edit its repository
+
+## Optional
+
+- [HTML page](https://harden-ci.secmy.app/): the same document rendered for people, with a table of contents
+- [Source repository](https://github.com/SecH0us3/harden-ci): history, issues and pull requests
